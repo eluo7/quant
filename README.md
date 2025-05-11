@@ -10,6 +10,7 @@
 - 数据可视化：Plotly
 
 ## 项目结构
+```
 quant/
 ├── core/                    # 核心功能模块
 │   ├── data_handler.py      # 数据获取与管理
@@ -25,6 +26,7 @@ quant/
 │   └── cache/              # 数据缓存
 └── config/                 # 配置文件
 └── config.json             # 配置参数
+```
 
 ## 安装依赖
 ```bash
