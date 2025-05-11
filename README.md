@@ -21,8 +21,7 @@
 ```
 quant/
 ├── core/                    # 核心功能模块
-│   ├── data_handler.py      # 数据获取与管理
-│   └── indicator_calculator.py # 技术指标计算
+│   └── data_collector.py    # 数据获取与管理
 ├── strategies/              # 策略定义
 │   ├── base_strategy.py     # 策略基类
 │   └── ma_cross_strategy.py # 示例：均线交叉策略

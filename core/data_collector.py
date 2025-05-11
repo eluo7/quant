@@ -95,15 +95,10 @@ class PolygonSource(DataSource):
             print(f"Polygon.io获取{symbol}数据失败: {e}")
             return None
 
-class DataHandler:
-    """数据获取和管理类"""
+class DataCollector:
+    """数据获取和管理类（单股票版本）"""
     
-    def __init__(
-        self,
-        data_source: str = "yfinance",
-        cache_dir: str = "../data/cache",
-        api_keys: Dict[str, str] = None
-    ):
+    def __init__(self, data_source: str = "polygon", cache_dir: str = "./data/cache", api_keys: Dict[str, str] = None):
         self.cache_dir = cache_dir
         os.makedirs(cache_dir, exist_ok=True)
         
@@ -130,83 +125,60 @@ class DataHandler:
         filename = f"{symbol}_{start}_{end}_{interval}.csv"
         return os.path.join(self.cache_dir, filename)
     
-    def fetch_data(
-        self,
-        symbols: List[str],
-        start_date: str,
-        end_date: Optional[str] = None,
-        interval: str = "1d",
-        use_cache: bool = True
-    ) -> Dict[str, pd.DataFrame]:
+    def fetch_data(self, symbol: str, start_date: str, end_date: Optional[str] = None, interval: str = "1d", use_cache: bool = True) -> Optional[pd.DataFrame]:
         """
-        获取股票历史数据
+        获取股票历史数据（单股票版本）
         
         参数:
-            symbols (List[str]): 股票代码列表，如 ['AAPL', 'MSFT']。
-                               获取单个股票数据时，传入单元素列表即可，如 ['AAPL']
+            symbol (str): 股票代码，如 'AAPL'
             start_date (str): 开始日期，格式 'YYYY-MM-DD'
             end_date (str, optional): 结束日期，格式 'YYYY-MM-DD'
             interval (str): 数据间隔，默认为日线 '1d'
             use_cache (bool): 是否使用缓存，默认为True
             
         返回:
-            Dict[str, pd.DataFrame]: 股票数据字典，key为股票代码，value为对应的DataFrame。
-                                   获取单个股票数据时，使用 result.get('AAPL') 获取数据
+            Optional[pd.DataFrame]: 股票数据DataFrame，如果获取失败则返回None
         """
         if end_date is None:
             end_date = datetime.now().strftime('%Y-%m-%d')
             
-        data = {}
-        for symbol in symbols:
-            cache_path = self._get_cache_path(symbol, start_date, end_date, interval)
-            
-            # 尝试从缓存加载数据
-            if use_cache and os.path.exists(cache_path):
-                try:
-                    df = pd.read_csv(cache_path, index_col=0, parse_dates=True)
-                    data[symbol] = df
-                    print(f"从缓存加载 {symbol} 的数据")
-                    continue
-                except Exception as e:
-                    print(f"读取缓存文件失败: {e}")
-            
-            # 从指定数据源获取数据
-            df = self.source.fetch_history(
-                symbol, start_date, end_date, interval
-            )
-            
-            if df is None:
-                print(f"警告: 未能获取到 {symbol} 的数据")
-                data[symbol] = None
-            else:
-                # 保存到缓存
-                if use_cache:
-                    df.to_csv(cache_path)
-                    print(f"数据已缓存到: {cache_path}")
-                data[symbol] = df
-                
-        return data
+        cache_path = self._get_cache_path(symbol, start_date, end_date, interval)
+        
+        # 尝试从缓存加载数据
+        if use_cache and os.path.exists(cache_path):
+            try:
+                df = pd.read_csv(cache_path, index_col=0, parse_dates=True)
+                print(f"从缓存加载 {symbol} 的数据")
+                return df
+            except Exception as e:
+                print(f"读取缓存文件失败: {e}")
+        
+        # 从指定数据源获取数据
+        df = self.source.fetch_history(
+            symbol, start_date, end_date, interval
+        )
+        
+        if df is None:
+            print(f"警告: 未能获取到 {symbol} 的数据")
+            return None
+        else:
+            # 保存到缓存
+            if use_cache:
+                df.to_csv(cache_path)
+                print(f"数据已缓存到: {cache_path}")
+            return df
 
 # 使用示例
 if __name__ == "__main__":
     # 使用 polygon 数据源
-    handler = DataHandler(data_source="polygon")
+    handler = DataCollector(data_source="polygon")
     
     # 获取最近30天的数据
     start = (datetime.now() - timedelta(days=365)).strftime('%Y-%m-%d')
     end = datetime.now().strftime('%Y-%m-%d')
     
-    # # 获取单只股票数据
-    # result = handler.fetch_data(['AAPL'], start, end)
-    # aapl_data = result.get('AAPL')
-    # if aapl_data is not None:
-    #     print("\nAAPL数据示例:")
-    #     print(aapl_data.head())
+    # 获取单只股票数据
+    result = handler.fetch_data('HOOD', start, end)
+    print("\n股票数据示例:")
+    print(result.head())
         
-    # 获取多只股票数据
-    stocks = ['NVDA', 'BABA']
-    multi_data = handler.fetch_data(stocks, start, end)
-    for symbol, df in multi_data.items():
-        if df is not None:
-            print(f"\n{symbol} 数据示例:")
-            print(df.head())

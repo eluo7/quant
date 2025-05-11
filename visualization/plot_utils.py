@@ -48,17 +48,6 @@ def print_backtest_results(symbol: str, results: Dict) -> None:
     
     # 打印风险指标
     print("\n风险指标:")
-    metrics = results['risk_metrics']
-    print(f"总收益率: {metrics['total_return']:.2%}")
-    print(f"年化收益率: {metrics['annual_return']:.2%}")
-    print(f"夏普比率: {metrics['sharpe_ratio']:.2f}")
-    print(f"最大回撤: {metrics['max_drawdown']:.2%}")
-    
-    # 打印交易统计
-    print("\n交易统计:")
-    stats = results['trade_stats']
-    print(f"总交易次数: {stats['total_trades']}")
-    print(f"胜率: {stats['win_rate']:.2%}")
-    print(f"平均盈利: ${stats['avg_win']:.2f}")
-    print(f"平均亏损: ${stats['avg_loss']:.2f}")
-    print(f"平均持仓时间: {stats['avg_hold_time']:.1f} 天")
+    print(f"总收益率: {results['total_return']:.2%}")
+    print(f"最大回撤: {results['max_drawdown']:.2%}")
+    print(f"最终收益率: {results['final_capital']:.2%}")
