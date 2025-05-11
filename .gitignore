@@ -1,11 +1,4 @@
-# 忽略配置文件但保留模板
-config/config.json
-*.env
-
-# 忽略缓存数据
-data/cache/
-
-# Python
+.env
+*.pyc
 __pycache__/
-*.py[cod]
-*$py.class
+data/cache/

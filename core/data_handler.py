@@ -4,6 +4,11 @@ from typing import List, Dict, Optional, Protocol
 import os
 from datetime import datetime, timedelta
 from abc import ABC, abstractmethod
+from dotenv import load_dotenv
+from polygon import RESTClient
+
+# 加载环境变量
+load_dotenv()
 
 class DataSource(ABC):
     """数据源抽象基类"""
@@ -45,7 +50,7 @@ class PolygonSource(DataSource):
     """Polygon.io数据源实现"""
     
     def __init__(self, api_key: str):
-        self.api_key = api_key
+        self.client = RESTClient(api_key)
         
     def fetch_history(
         self,
@@ -54,10 +59,41 @@ class PolygonSource(DataSource):
         end_date: str,
         interval: str = "1d"
     ) -> Optional[pd.DataFrame]:
-        # TODO: 实现Polygon.io的数据获取逻辑
-        # 需要安装polygon-api-client并使用API KEY
-        print("Polygon.io数据源尚未实现")
-        return None
+        try:
+            # 转换日期格式
+            start = datetime.strptime(start_date, '%Y-%m-%d')
+            end = datetime.strptime(end_date, '%Y-%m-%d')
+            
+            # 获取股票数据
+            aggs = self.client.get_aggs(
+                symbol,
+                1,  # 复权因子
+                'day' if interval == '1d' else interval,
+                start.strftime('%Y-%m-%d'),
+                end.strftime('%Y-%m-%d')
+            )
+            
+            if not aggs:
+                print(f"Polygon.io未能获取到 {symbol} 的数据")
+                return None
+            
+            # 转换为DataFrame
+            df = pd.DataFrame([{
+                'Open': agg.open,
+                'High': agg.high,
+                'Low': agg.low,
+                'Close': agg.close,
+                'Volume': agg.volume,
+                'Date': datetime.fromtimestamp(agg.timestamp/1000)
+            } for agg in aggs])
+            
+            # 设置索引
+            df.set_index('Date', inplace=True)
+            return df
+            
+        except Exception as e:
+            print(f"Polygon.io获取{symbol}数据失败: {e}")
+            return None
 
 class DataHandler:
     """数据获取和管理类"""
@@ -69,6 +105,9 @@ class DataHandler:
         cache_dir: str = "data/cache",
         api_keys: Dict[str, str] = None
     ):
+        # 加载 .env 文件（如果还没加载）
+        load_dotenv()
+        
         self.cache_dir = cache_dir
         os.makedirs(cache_dir, exist_ok=True)
         
