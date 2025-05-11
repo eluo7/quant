@@ -193,18 +193,18 @@ if __name__ == "__main__":
     handler = DataHandler(data_source="polygon")
     
     # 获取最近30天的数据
-    start = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+    start = (datetime.now() - timedelta(days=365)).strftime('%Y-%m-%d')
     end = datetime.now().strftime('%Y-%m-%d')
     
-    # 获取单只股票数据
-    result = handler.fetch_data(['AAPL'], start, end)
-    aapl_data = result.get('AAPL')
-    if aapl_data is not None:
-        print("\nAAPL数据示例:")
-        print(aapl_data.head())
+    # # 获取单只股票数据
+    # result = handler.fetch_data(['AAPL'], start, end)
+    # aapl_data = result.get('AAPL')
+    # if aapl_data is not None:
+    #     print("\nAAPL数据示例:")
+    #     print(aapl_data.head())
         
     # 获取多只股票数据
-    stocks = ['AAPL', 'MSFT', 'GOOGL']
+    stocks = ['NVDA', 'BABA']
     multi_data = handler.fetch_data(stocks, start, end)
     for symbol, df in multi_data.items():
         if df is not None:

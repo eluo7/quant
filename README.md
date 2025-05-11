@@ -12,7 +12,7 @@
 这是一个基于Python的量化交易策略框架，集成了数据获取、技术指标计算、策略回测和可视化功能。
 
 ## 技术栈
-- 数据获取：yfinance
+- 数据获取：yfinance polygon.io
 - 技术指标：TA-Lib
 - 回测引擎：vectorbt
 - 数据可视化：Plotly
