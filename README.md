@@ -38,3 +38,11 @@ pip install yfinance pandas numpy ta-lib vectorbt plotly
 2. 技术指标：支持MA、RSI等150+种技术指标
 3. 策略回测：使用vectorbt进行高效回测
 4. 结果可视化：使用Plotly生成交互式图表
+
+## 配置说明
+在使用 Polygon.io 数据源时，需要配置 API 密钥。有两种方式：
+
+1. 环境变量（推荐）：
+```bash
+export POLYGON_API_KEY="your_api_key"
+```
