@@ -63,7 +63,7 @@ class BacktestEngine:
         df.loc[long_exits, 'trade_price'] = next_open_prices * (1 - self.slippage)
         
         # 资金变化
-        df['Capital'] = portfolio.value()
+        df['capital'] = portfolio.value()
         
         # 获取回测结果
         total_return = portfolio.total_profit()
