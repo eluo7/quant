@@ -1,4 +1,4 @@
-from core.data_handler import DataHandler
+from core.data_collector import DataCollector
 from strategy.ma_cross_strategy import MACrossStrategy
 from backtesting.backtest_engine import BacktestEngine
 from visualization.plot_utils import plot_portfolio_metrics, print_backtest_results
@@ -13,7 +13,7 @@ def run_backtest(
     """运行回测流程"""
     
     # 1. 初始化组件
-    data_handler = DataHandler(data_source="polygon")
+    data_handler = DataCollector(data_source="polygon")
     strategy = MACrossStrategy(
         symbols=symbols,
         start_date=start_date,
