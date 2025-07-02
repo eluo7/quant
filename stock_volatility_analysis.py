@@ -76,7 +76,7 @@ def visualize_volatility(ticker: str, historical_returns: np.ndarray, input_retu
 def main():
     ticker = 'NVDL'
     # 假设涨幅，由用户指定
-    input_return = 0.06
+    input_return = 0.05
     n_days = 365
     # 获取数据
     df = get_stock_data(ticker, n_days)
